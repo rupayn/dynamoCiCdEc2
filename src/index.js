@@ -124,45 +124,32 @@ app.put("/update", async (req, res) => {
   }
 });
 
-/* =========================
-   Delete User
-========================= */
 
-app.get("/:id", async (req, res) => {
+app.get("/users/:id", async (req, res) => {
   const { id } = req.params;
 
+  if (!id) {
+    return res.status(400).json(messageGenerator(400, "id is required"));
+  }
+
   try {
-    const command = new GetCommand({
-      TableName: TABLE_NAME,
-      Key: {
-        id,
-      },
-    });
+    const { Item } = await dynamoDB.send(
+      new GetCommand({
+        TableName: TABLE_NAME,
+        Key: { id },
+      })
+    );
 
-    const data = await dynamoDB.send(command);
-
-    console.log("DynamoDB response:", data);
-
-    if (!data.Item) {
-      return res.status(404).json({
-        message: "User not found",
-      });
+    if (!Item) {
+      return res.status(404).json(messageGenerator(404, "User not found"));
     }
 
     return res.status(200).json(
-      messageGenerator(
-        200,
-        "User fetched successfully",
-        data.Item
-      )
+      messageGenerator(200, "User fetched successfully", Item)
     );
   } catch (err) {
     console.error("DynamoDB error:", err);
-
-    return res.status(500).json({
-      message: err.message,
-      name: err.name,
-    });
+    return res.status(500).json({ message: err.message, name: err.name });
   }
 });
 
