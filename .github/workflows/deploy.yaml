@@ -46,17 +46,17 @@ jobs:
           script: |
             echo "Pulling latest Docker image..."
 
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/dynambo-api:latest
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/dynambo-api:latest
 
             echo "Stopping old container..."
-            docker stop dynambo-api || true
+            sudo docker stop dynambo-api || true
 
             echo "Removing old container..."
-            docker rm dynambo-api || true
+            sudo docker rm dynambo-api || true
 
             echo "Starting new container..."
 
-            docker run -d \
+            sudo docker run -d \
               --name dynambo-api \
               --restart unless-stopped \
               -p 3000:3000 \
@@ -64,9 +64,9 @@ jobs:
               ${{ secrets.DOCKERHUB_USERNAME }}/dynambo-api:latest
 
             echo "Removing unused images..."
-            docker image prune -f
+            sudo docker image prune -f
 
             echo "Deployment completed!"
 
             echo "Running containers:"
-            docker ps
+            sudo docker ps
