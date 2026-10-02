@@ -72,41 +72,7 @@ app.post("/create", async (req, res) => {
   }
 });
 
-/* =========================
-   Get User
-========================= */
 
-app.get("/:id", async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const command = new GetCommand({
-      TableName: TABLE_NAME,
-
-      Key: {
-        id,
-      },
-    });
-
-    const data = await dynamoDB.send(command);
-    
-
-    res.json(
-      messageGenerator(
-        200,
-        "User fetched successfully",
-        data
-      )
-    );
-  } catch (err) {
-    console.error("DynamoDB error:", err);
-
-    res.status(500).json({
-      message: err.message,
-      name: err.name,
-    });
-  }
-});
 
 /* =========================
    Update User
