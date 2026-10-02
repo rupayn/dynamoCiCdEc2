@@ -32,7 +32,7 @@ const dynamoDB = DynamoDBDocumentClient.from(client);
 ========================= */
 
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+  res.send("Hello World! 2222");
 });
 
 /* =========================
@@ -89,6 +89,7 @@ app.get("/:id", async (req, res) => {
     });
 
     const data = await dynamoDB.send(command);
+    
 
     res.json(
       messageGenerator(
@@ -161,13 +162,12 @@ app.put("/update", async (req, res) => {
    Delete User
 ========================= */
 
-app.delete("/:id", async (req, res) => {
+app.get("/:id", async (req, res) => {
   const { id } = req.params;
 
   try {
-    const command = new DeleteCommand({
+    const command = new GetCommand({
       TableName: TABLE_NAME,
-
       Key: {
         id,
       },
@@ -175,17 +175,25 @@ app.delete("/:id", async (req, res) => {
 
     const data = await dynamoDB.send(command);
 
-    res.json(
+    console.log("DynamoDB response:", data);
+
+    if (!data.Item) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    return res.status(200).json(
       messageGenerator(
         200,
-        "User deleted successfully",
-        data
+        "User fetched successfully",
+        data.Item
       )
     );
   } catch (err) {
     console.error("DynamoDB error:", err);
 
-    res.status(500).json({
+    return res.status(500).json({
       message: err.message,
       name: err.name,
     });
